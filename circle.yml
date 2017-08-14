@@ -8,6 +8,8 @@ machine:
     NS_ZONES_DIR: /home/ubuntu/highwaytohell/zones.d
     REDIS_HOST: 127.0.0.1
     REDIS_PORT: 6379
+  node:
+    version: 6.9.1
   services:
     - cassandra
 test:
@@ -30,6 +32,14 @@ test:
 # //
     - sudo apt-get install -y gcc g++ make rsync build-essential ldnsutils nsd
     - cp -p samples.d/nsd/nsd.conf samples.d/nsd/server.conf .
+    - cp -p samples.d/butters.cfg.sample /home/ubuntu/.butters.cfg
     - mkdir zones.d keys.d nsd.conf.d
+    - touch ./nsd.conf.d/highwaytohell-zones.conf
+    - sudo pip install --upgrade cqlsh
+    - npm install -g pm2
     - make dbinittest
-    - npm install
+    - pm2 start workers/apiGW.js
+    - pm2 start workers/checkHealth.js
+    - pm2 start workers/outboundNotifier.js
+    - pm2 start workers/refreshZones.js
+    - sleep 20

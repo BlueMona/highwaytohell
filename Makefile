@@ -28,13 +28,12 @@ rewrap:
 dbinit:
 	test -f db/cassandra.init || return 0
 	test "$$CASSANDRA_HOST" || return 0
-	cat db/cassandra.init | cqlsh $$CASSANDRA_HOST
+	grep -vE '^(#|$$)' db/cassandra.init | cqlsh --cqlversion=3.4.0 $$CASSANDRA_HOST
 
 dbinittest: dbinit
 	test -f db/cassandra.test || return 0
 	test "$$CASSANDRA_HOST" || return 0
-	cat db/cassandra.test | cqlsh $$CASSANDRA_HOST
-
+	grep -v '^(#|$$)' db/cassandra.test | cqlsh --cqlversion=3.4.0 $$CASSANDRA_HOST
 
 install:
 	test -d $(DOC_DIR) || mkdir -p $(DOC_DIR)
@@ -120,7 +119,6 @@ clean:
 cleanCI: clean
 	rm -rf zones.d keys.d nsd.conf.d
 
-
 createdebsource:
 	LANG=C debuild -S -sa
 
@@ -149,6 +147,9 @@ createinitialarchive: sourceismissing
 	sed -i "s|(\([0-9]*\.[0-9]*\.[0-9]*-\)\([0-9]*\)) unstable;|(\1$${suffix}\2) unstable;|" debian/changelog
 	version=`awk '/^highwaytohell/{print $$2;exit}' debian/changelog | sed -e 's|^[^0-9]*\([0-9]*\.[0-9]*\.[0-9]*\)-.*|\1|'`; \
 	( cd .. ; tar -czf highwaytohell_$$version.orig.tar.gz highwaytohell )
+
+test:
+	./tests/butters.sh
 
 release:
 ifeq ($(GITHUB_USER),)
