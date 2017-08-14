@@ -114,10 +114,15 @@ clean:
 		    rm -fr ./$$line; \
 		done; \
 	fi
-	rm -fr *log node_modules
+	rm -fr *log
 
-cleanCI: clean
-	rm -rf zones.d keys.d nsd.conf.d
+reset:
+	git reset; \
+	for item in api *.md *.yml *.json .gitignore db debian lib LICENSE Makefile node_shrinkwrap samples.d static templates tests workers; \
+	do \
+	    rm -fr $$item; \
+	    git checkout -- $$item; \
+	done
 
 createdebsource:
 	LANG=C debuild -S -sa
@@ -125,7 +130,7 @@ createdebsource:
 createdebbin:
 	LANG=C dpkg-buildpackage -us -uc
 
-createinitialarchive: sourceismissing
+createinitialarchive: clean sourceismissing
 	if test -d .git; then \
 	    case "`git branch | awk '/^\*/{print $$2}'`" in \
 		master|production|oldbear-prod)	suffix=		;; \
@@ -135,12 +140,6 @@ createinitialarchive: sourceismissing
 	    esac; \
 	else \
 	    suffix=; \
-	fi; \
-	if test -s .gitignore; then \
-	    grep -vE '^(#|$$)' .gitignore | while read line; \
-		do \
-		    rm -fr ./$$line; \
-		done; \
 	fi; \
 	git rev-parse HEAD >revision 2>/dev/null || echo alpha >revision; \
 	rm -fr .git .gitignore .gitrelease circle.yml samples.d/diags debian/highwaytohell debian/highwaytohell.debhelper.log; \

@@ -1,4 +1,4 @@
-i#!/bin/sh
+#!/bin/sh
 
 if ! ./samples.d/butters | grep peerio.com; then
     echo failed listing domains

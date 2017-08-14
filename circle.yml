@@ -15,7 +15,11 @@ machine:
 test:
   override:
     - make test
-    - make cleanCI
+    - pm2 delete apiGW
+    - pm2 delete checkHealth
+    - pm2 delete outboundNotifier
+    - pm2 delete refreshZones
+    - make reset
     - make createinitialarchive
     - make createdebbin
   pre:
@@ -33,7 +37,7 @@ test:
     - sudo apt-get install -y gcc g++ make rsync build-essential ldnsutils nsd
     - cp -p samples.d/nsd/nsd.conf samples.d/nsd/server.conf .
     - cp -p samples.d/butters.cfg.sample /home/ubuntu/.butters.cfg
-    - mkdir zones.d keys.d nsd.conf.d
+    - mkdir zones.d keys.d nsd.conf.d logs
     - touch ./nsd.conf.d/highwaytohell-zones.conf
     - sudo pip install --upgrade cqlsh
     - npm install -g pm2
