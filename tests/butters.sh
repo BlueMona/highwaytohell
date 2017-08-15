@@ -10,10 +10,10 @@ if ! ./samples.d/butters | grep peerio.com; then
 elif ! ./samples.d/butters -d peerio.com -a get --getdsrecords | grep '^{}$'; then
     echo failed fetching ds records
     exit 1
-elif ! butters -R notifications; then
+elif ! ./samples.d/butters -R notifications; then
     echo failed listing notifications
     exit 1
-elif ! butters -R records; then
+elif ! ./samples.d/butters -R records; then
     echo failed listing records
     exit 1
 fi
