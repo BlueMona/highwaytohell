@@ -30,7 +30,7 @@ if ! ./samples.d/butters -d peerio.com -R records -a add -r @ -T myrelay.mail.co
     echo failed adding mx record
     ret=`expr $ret + 1`
 fi
-if ! ./samples.d/butters -d peerio.com -R records -a get --record @ | grep mailrelay; then
+if ! ./samples.d/butters -d peerio.com -R records -a get --record @ | grep myrelay; then
     echo failed fetching record by name
     ret=`expr $ret + 1`
 fi
