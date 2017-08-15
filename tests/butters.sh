@@ -26,7 +26,7 @@ if ! ./samples.d/butters -d peerio.com -R records | grep iceblobvirginia; then
     echo failed listing records
     ret=`expr ret + 1`
 fi
-if ! ./samples.d/butters -d peerio.com -R records -a add -r @ -T myrelay.mail.com -t MX --priority 10
+if ! ./samples.d/butters -d peerio.com -R records -a add -r @ -T myrelay.mail.com -t MX --priority 10; then
     echo failed adding mx record
     ret=`expr ret + 1`
 fi
