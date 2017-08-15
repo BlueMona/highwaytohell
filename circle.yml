@@ -39,7 +39,9 @@ test:
     - cp -p samples.d/butters.cfg.sample /home/ubuntu/.butters.cfg
     - mkdir zones.d keys.d nsd.conf.d logs
     - touch ./nsd.conf.d/highwaytohell-zones.conf
+# wtf?
     - sudo pip install --upgrade cqlsh
+# //
     - npm install -g pm2
     - make dbinittest
     - pm2 start workers/apiGW.js

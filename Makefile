@@ -147,7 +147,22 @@ createinitialarchive: clean sourceismissing
 	version=`awk '/^highwaytohell/{print $$2;exit}' debian/changelog | sed -e 's|^[^0-9]*\([0-9]*\.[0-9]*\.[0-9]*\)-.*|\1|'`; \
 	( cd .. ; tar -czf highwaytohell_$$version.orig.tar.gz highwaytohell )
 
-test:
+processestest:
+	for proc in refreshZones apiGW outboundNotifier checkHealth; \
+	do \
+	    if ! pm2 show $$proc 2>&1 | grep online >/dev/null; then \
+		echo $$proc is dead; \
+		test "$$CIRCLECI" && pm2 show $$proc; \
+		exit 1; \
+	    elif ! pm2 show $$proc 2>&1 | grep -E ' restarts .* 0 ' >/dev/null; then \
+		echo $$proc is restarting; \
+		test "$$CIRCLECI" && pm2 show $$proc; \
+		exit 1; \
+	    fi; \
+	done
+	echo "all processes healthy"
+
+test: processestest
 	./tests/butters.sh
 
 release:
