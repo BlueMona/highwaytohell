@@ -17,7 +17,7 @@ CREATE TABLE users (
 CREATE TABLE contactaddresses (
 	uuid varchar,
 	type varchar,
-	target varchar
+	target varchar,
 	confirmcode varchar,
 	PRIMARY KEY (uuid, target)
     );
