@@ -28,12 +28,20 @@ rewrap:
 dbinit:
 	test -f db/cassandra.init || return 0
 	test "$$CASSANDRA_HOST" || return 0
-	grep -vE '^(#|$$)' db/cassandra.init | cqlsh --cqlversion=3.4.0 $$CASSANDRA_HOST
+	if test "$$CIRCLECI"; then \
+	    grep -vE '^(#|$$)' db/cassandra.init | cqlsh --cqlversion=3.4.0 $$CASSANDRA_HOST; \
+	else \
+	    grep -vE '^(#|$$)' db/cassandra.init | cqlsh $$CASSANDRA_HOST; \
+	fi
 
 dbinittest: dbinit
 	test -f db/cassandra.test || return 0
 	test "$$CASSANDRA_HOST" || return 0
-	grep -v '^(#|$$)' db/cassandra.test | cqlsh --cqlversion=3.4.0 $$CASSANDRA_HOST
+	if test "$$CIRCLECI"; then \
+	    grep -v '^(#|$$)' db/cassandra.test | cqlsh --cqlversion=3.4.0 $$CASSANDRA_HOST; \
+	else \
+	    grep -v '^(#|$$)' db/cassandra.test | cqlsh $$CASSANDRA_HOST; \
+	fi
 
 install:
 	test -d $(DOC_DIR) || mkdir -p $(DOC_DIR)
@@ -162,7 +170,13 @@ processestest:
 	done
 	echo "all processes healthy"
 
-test: processestest
+pingtest:
+	if ! curl http://127.0.0.1:8080/ping | grep '^OK$$'; then \
+	    echo apiGW ping failed; \
+	    exit 1; \
+	fi
+
+test: processestest pingtest
 	./tests/butters.sh
 
 release:
