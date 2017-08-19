@@ -1,3 +1,11 @@
+function addAuthorization(domainName) {
+    var userForm = document.getElementById('mgtuser');
+    var roleForm = document.getElementById('mgtrole');
+    userForm.value = '';
+    roleForm.value = 'admin';
+    showForm('Add Authorization');
+}
+
 function addHealthCheck(domainName) {
     var actionForm = document.getElementById('formhealthchecks');
     var headersForm = document.getElementById('checkheaders');
@@ -5,6 +13,7 @@ function addHealthCheck(domainName) {
     var idForm = document.getElementById('checkid');
     var invertForm = document.getElementById('checkinvert');
     var matchForm = document.getElementById('checkmatch');
+    var nameForm = document.getElementById('checkname');
     var targetForm = document.getElementById('checktarget');
     var typeForm = document.getElementById('checktype');
     var unhealthyForm = document.getElementById('checkunhealthy');
@@ -14,6 +23,7 @@ function addHealthCheck(domainName) {
     idForm.value = '';
     invertForm.checked = false;
     matchForm.value = '';
+    nameForm.value = '';
     targetForm.value = '';
     typeForm.value = 'http';
     unhealthyForm.value = 2;
@@ -60,7 +70,7 @@ function addToken() {
     var actionForm = document.getElementById('formtokens');
     var permsForm = document.getElementById('tokperms');
     var sourcesForm = document.getElementById('toksources');
-    actionForm.action = '/tokens/add';
+    actionForm.action = '/settings/tokens/add';
     permsForm.value = '*';
     sourcesForm.value = '*';
     showForm('Add Token');
@@ -86,6 +96,13 @@ function drop(ev) {
     d.style.position = 'absolute';
     d.style.left = ev.clientX + 'px';
     d.style.top = ev.clientY + 'px';
+}
+
+function dropAuthorization(domainName, userId) {
+    var usure = confirm('Deny ' + userId + ' accesses to ' + domainName + '? This can not be un-done');
+    if (usure === true) {
+	post('/domains/' + domainName + '/admin/del', { thirdParty: userId });
+    }
 }
 
 function dropContact(target) {
@@ -126,26 +143,36 @@ function dropRecord(domainName, name, type, setId) {
 function dropToken(tokenString) {
     var usure = confirm('Drop token? This can not be un-done');
     if (usure === true) {
-	post('/tokens/del', { tokenString: tokenString });
+	post('/settings/tokens/del', { tokenString: tokenString });
     }
 }
 
-function editHealthCheck(domainName, checkId, checkType, checkHeaders, checkTarget, checkMatch, checkHealthy, checkUnhealthy, checkInvert) {
+function editAuthorization(domainName, userId, role) {
+    var userForm = document.getElementById('mgtuser');
+    var roleForm = document.getElementById('mgtrole');
+    userForm.value = userId;
+    roleForm.value = role;
+    showForm('Edit Authorization');
+}
+
+function editHealthCheck(domainName, checkId, checkName, checkType, checkHeaders, checkTarget, checkMatch, checkHealthy, checkUnhealthy, checkInvert) {
     var actionForm = document.getElementById('formhealthchecks');
     var headersForm = document.getElementById('checkheaders');
     var healthyForm = document.getElementById('checkhealthy');
     var idForm = document.getElementById('checkid');
     var invertForm = document.getElementById('checkinvert');
     var matchForm = document.getElementById('checkmatch');
+    var nameForm = document.getElementById('checkname');
     var targetForm = document.getElementById('checktarget');
     var typeForm = document.getElementById('checktype');
     var unhealthyForm = document.getElementById('checkunhealthy');
     actionForm.action = '/healthchecks/' + domainName + '/edit/' + checkId;
-    headersForm.value = checkHeaders;
+    headersForm.value = (checkHeaders !== '-' ? checkHeaders : '');
     healthyForm.value = checkHealthy;
     idForm.value = checkId;
     invertForm.checked = (checkInvert !== 'no');
-    matchForm.value = checkMatch;
+    matchForm.value = (checkMatch !== '-' ? checkMatch : '');
+    nameForm.value = checkName;
     targetForm.value = checkTarget;
     typeForm.value = checkType;
     unhealthyForm.value = checkUnhealthy;
@@ -218,7 +245,7 @@ function editToken(tokenId, tokenPerms, tokenSources) {
     var idForm = document.getElementById('tokenid');
     var permsForm = document.getElementById('tokperms');
     var sourceForm = document.getElementById('toksources');
-    actionForm.action = '/tokens/edit';
+    actionForm.action = '/settings/tokens/edit';
     idForm.value = tokenId;
     permsForm.value = tokenPerms;
     sourceForm.value = tokenSources;
@@ -281,6 +308,18 @@ function showForm(title) {
 	if (formTitle) { formTitle.innerHTML = title; }
 	var submitForm = document.getElementById('hacksubmit');
 	if (submitForm) { submitForm.value = title; }
+	var setSize = false;
+	if (title.indexOf('Authorization') >= 0) { setSize = '150px'; }
+	else if (title.indexOf('Settings') >= 0) { setSize = '200px'; }
+	else if (title.indexOf('Contact') >= 0) { setSize = '130px'; }
+	else if (title.indexOf('Health Check') >= 0) { setSize = '280px'; }
+	else if (title.indexOf('Notification') >= 0) { setSize = '230px'; }
+	else if (title.indexOf('Record') >= 0) { setSize = '240px'; }
+	else if (title.indexOf('Token') >= 0) { setSize = '150px'; }
+	if (setSize !== false) {
+	    var nstd = document.getElementById('droppable');
+	    if (nstd) { nstd.style.height = setSize; }
+	}
     }
 }
 
