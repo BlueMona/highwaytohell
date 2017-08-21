@@ -35,7 +35,7 @@ if (process.env.AIRBRAKE_ID !== undefined && process.env.AIRBRAKE_KEY !== undefi
 }
 if (process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.TWILIO_FROM) {
     try {
-	smsHandle = require('twilio')(process.env.TWILIO_SID, PROCESS.env.TWILIO_TOKEN);
+	smsHandle = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
     } catch(e) {
 	logger.error('WARNING: failed initializing twilio client');
 	logger.error(e);
