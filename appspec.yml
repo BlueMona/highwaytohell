@@ -1,0 +1,21 @@
+version: 0.0
+os: linux
+files:
+  - source: ./dist
+    destination: /var/spool/peerio-codedeploy
+permissions:
+  - object: ./
+    owner: root
+    mode: 644
+    type:
+      - file
+  - object: ./
+    owner: root
+    mode: 755
+    type:
+      - directory
+hooks:
+  ApplicationStart:
+    - location: samples.d/codedeploy.sh
+      timeout: 30000
+      runas: root

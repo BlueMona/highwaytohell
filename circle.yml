@@ -13,6 +13,20 @@ machine:
     version: 6.9.1
   services:
     - cassandra
+deployment:
+  master:
+    branch: master
+    codedeploy:
+      HWTH:
+        application_root: /
+        deployment_config: CodeDeployDefault.OneAtATime
+        deployment_group: HWTH-Staging
+        region: us-east-1
+        revision_location:
+          revision_type: S3
+          s3_location:
+            bucket: peerio-server-code-deploy
+            key_pattern: peerio/hwth-{BUILD_NUM}-{BRANCH}-{SHORT_COMMIT}
 test:
   override:
     - make test
@@ -23,6 +37,10 @@ test:
     - make reset
     - make createinitialarchive
     - make createdebbin
+  post:
+    - mkdir dist
+    - mv ../highwaytohell_* dist/
+    - rm -fr node_shrinkwrap lib api workers node_modules templates static
   pre:
 # circleCI provides with redis-2.8.4 (trusty images) -- ironically, the 3.x on precise would have done
     - sudo service redis-server stop || true
