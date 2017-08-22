@@ -37,7 +37,7 @@ check_pre()
 	fi
 	for d in $NS_ROOT_DIR $NS_KEYS_DIR $NS_ZONES_DIR $ALSO
 	do
-	    test -d $d
+	    test -d $d || mkdir -p $d
 	    chown root:hwth $d
 	    chmod 775 $d
 	done
